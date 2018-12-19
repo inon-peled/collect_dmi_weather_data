@@ -1,3 +1,6 @@
+# SUGGESTED CRONTAB:
+# 0,10,20,30,40,50 * * * * cd /home/scripts/collect_dmi_weather_data/ && ./venv/bin/python3 ./dmi_collect.py >> crontab.log 2>&1
+
 import requests
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
