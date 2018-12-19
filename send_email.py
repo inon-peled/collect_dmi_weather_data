@@ -1,3 +1,4 @@
+from logger import info
 import json
 from email.message import EmailMessage
 import smtplib
@@ -15,13 +16,14 @@ def send(subject, body, smtp_config_path='smtp_config.json'):
     msg['To'] = config['to']
     msg['Subject'] = subject
     msg.set_content(body)
+    info('Sending:\n%s' % msg)
 
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.ehlo()
     server.login(config['user'], config['password'])
     server.send_message(msg)
     server.close()
-    print('Email sent')
+    info('Email sent')
 
 
 if __name__ == '__main__':
