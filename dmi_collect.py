@@ -13,18 +13,17 @@ SAVE_DIR = os.path.join('.', 'data')
 
 
 def retry_session(retries, session=None, backoff_factor=0.3, status_forcelist=(500, 502, 503, 504)):
-    session = session or requests.Session()
-    retry = Retry(
+    adapter = HTTPAdapter(max_retries=Retry(
         total=retries,
         read=retries,
         connect=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
-    )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-    return session
+    ))
+    sess = session if session is not None else requests.Session()
+    sess.mount('http://', adapter)
+    sess.mount('https://', adapter)
+    return sess
 
 
 def get_last_reading_for_all_stations_in_denmark():
