@@ -1,3 +1,6 @@
+*.log
+venv/
+__pycache__/
 *.json
 data/
 .idea/
