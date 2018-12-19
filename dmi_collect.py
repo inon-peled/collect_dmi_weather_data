@@ -1,16 +1,34 @@
+import requests
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 from logger import info
 import socket
 from send_email import send
 import os
 from datetime import datetime
-import requests
 
+RETRIES = 5
 REQUEST_TIMEOUT_SEC = 60
 SAVE_DIR = os.path.join('.', 'data')
 
 
+def retry_session(retries, session=None, backoff_factor=0.3, status_forcelist=(500, 502, 503, 504)):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
 def get_last_reading_for_all_stations_in_denmark():
-    with requests.get(
+    with retry_session(retries=RETRIES).get(
             'https://beta.dmi.dk/NinJo2DmiDk/ninjo2dmidk?cmd=obj&east=-180&west=180&south=-90&north=90',
             timeout=REQUEST_TIMEOUT_SEC) as r:
         r.raise_for_status()
